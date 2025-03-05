@@ -1,0 +1,4 @@
+*.log
+*.xdf
+.vscode
+lsl_env
