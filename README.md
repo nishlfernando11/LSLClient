@@ -14,7 +14,7 @@ Install dependencies with:
 
 ```bash
 pip install pylsl
-
+```
 
 ## Run  
 
