@@ -2,3 +2,7 @@
 *.xdf
 .vscode
 lsl_env
+data
+datalogs
+*.json
+*.csv
