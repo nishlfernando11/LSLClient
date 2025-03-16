@@ -77,7 +77,7 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     # **Step 1: Load & Extract Data**
-    xdf_file = args.file_path or "block_.xdf"
+    xdf_file = args.file_path or "sub-P001_ses-S001_task-Default_run-001_eeg"
     if args.file_path:
         filename = args.file_path.split("/")[-1]
         stream_data = load_xdf_data(xdf_file)
@@ -87,7 +87,7 @@ if __name__ == "__main__":
 
         print(synced_df.head())  # Show the first few rows
 
-        synced_df.to_csv(f"{filename.split('.')[0]}.csv", index=False)
+        synced_df.to_csv(f"data_csv/{filename.split('.')[0]}.csv", index=False)
         print("Synchronized data saved to synced_data.csv")
     else:
         print("Error: file name is missing.")
