@@ -6,3 +6,4 @@ data
 datalogs
 *.json
 *.csv
+*_log.txt
