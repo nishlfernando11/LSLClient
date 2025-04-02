@@ -31,16 +31,13 @@ def print_data(data_sample, data_timestamp, data_offset, type):
         print(f"{type}_sample ", data_sample)
 
         cor_data_timestamp = data_timestamp + data_offset
-        print(f"\n\n---{type}Rate: {data_sample}")
+        print(f"\n\n---{type}: {data_sample}")
         print(f"---{type} timestamp: {cor_data_timestamp}")
         logging.debug(f"{type} {cor_data_timestamp}, {data_sample}")
         
-        
-import pylsl
-import time
 
 def safe_resolve(name):
-    """Helper function to resolve an LSL stream safely, returning None if not found."""
+    """Helper function to resolve an LSL stream safely, returning None if not found.    """
     streams = resolve_byprop('name', name)
     return StreamInlet(streams[0]) if streams else None
 
@@ -53,6 +50,7 @@ ir_inlet = safe_resolve('EQ_IR_Stream')
 skinTemp_inlet = safe_resolve('EQ_SkinTemp_Stream')
 accel_inlet = safe_resolve('EQ_Accel_Stream')
 gsr_inlet = safe_resolve('EQ_GSR_Stream')
+oc_inlet = safe_resolve('OvercookedStream')
 
 # Get current Unix timestamp to align LSL timestamps
 lsl_start_time = pylsl.local_clock()  # LSL time reference
@@ -79,6 +77,7 @@ accel_offset = safe_time_correction(accel_inlet, "Accel")
 skinTemp_offset = safe_time_correction(skinTemp_inlet, "SkinTemp")
 gsr_offset = safe_time_correction(gsr_inlet, "GSR")
 eye_offset = safe_time_correction(eye_inlet, "Eye Tracker")
+oc_offset = safe_time_correction(oc_inlet, "Overcooked")
 
 # Retrieve stream metadata safely
 if ecg_inlet:
@@ -248,6 +247,12 @@ while True:
     if eye_sample:
         # 3Deserialize JSON String to Python Dictionary
         print_data(eye_sample, eye_timestamp, eye_offset, "Eye")
+
+    # Fetch Overcooked sample
+    oc_sample, oc_timestamp = oc_inlet.pull_sample(timeout=0.0)
+    if oc_sample:
+        # 3Deserialize JSON String to Python Dictionary
+        print_data(oc_sample, oc_timestamp, oc_offset, "Overcooked")
     # Sleep for a bit (simulate processing)
     time.sleep(0.001)  # Adjust as need
 
