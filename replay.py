@@ -12,6 +12,10 @@ stream_info = {
     "EQ_IR_Stream": pylsl.StreamInfo("EQ_IR_Stream", "IR", 1, 25.6, pylsl.cf_string, "Equivital"),
     "EQ_SkinTemp_Stream": pylsl.StreamInfo("EQ_SkinTemp_Stream", "SkinTemp", 1, 1.0/15, pylsl.cf_string, "Equivital"),
     "EQ_GSR_Stream": pylsl.StreamInfo("EQ_GSR_Stream", "GSR", 1, 16, pylsl.cf_string, "Equivital"),
+    "Eye_Tracker_Stream": pylsl.StreamInfo("Eye_Tracker_Stream", "Eye", 1, 60, pylsl.cf_string, "tobii"),
+    "OvercookedStream": pylsl.StreamInfo("OvercookedStream", "Event", 1, 0, pylsl.cf_string, "Overcooked"),
+    "Emotiv_EEG": pylsl.StreamInfo("Emotiv_EEG", "EEG", 1, 256, pylsl.cf_string, "emotiv"),
+    "Emotiv_MET": pylsl.StreamInfo("Emotiv_MET", "MET", 1, 0.1, pylsl.cf_string, "emotiv")
 }
 
 # Create LSL outlets for each stream

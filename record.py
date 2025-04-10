@@ -3,11 +3,11 @@ import csv
 import time
 
 # List of streams to record
-stream_names = [
-    "EQ_ECG_Stream", "EQ_HR_Stream", "EQ_RR_Stream", 
-    "EQ_IR_Stream", "EQ_SkinTemp_Stream", "EQ_Accel_Stream", 
-    "EQ_GSR_Stream", "Eye_Tracker_Stream"
-]
+stream_names = ['EQ_ECG_Stream', 'EQ_HR_Stream', 'EQ_Accel_Stream',
+                'EQ_IR_Stream', 'EQ_RR_Stream', 'EQ_SkinTemp_Stream',
+                'EQ_GSR_Stream', 'Eye_Tracker_Stream', 'OvercookedStream',
+                'Emotiv_EEG', 'Emotiv_MET']
+
 
 # Open CSV file for writing
 with open("lsl_recorded_data.csv", "w", newline="") as file:
