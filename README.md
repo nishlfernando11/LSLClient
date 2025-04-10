@@ -20,7 +20,7 @@ pip install pylsl
 
 
 ```bash
-python subscriber.py
+python main.py
 ```
 
 ### LSL important details:
