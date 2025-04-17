@@ -15,7 +15,12 @@ if streams:
     print(f"Channel Format: {info.channel_format()}")
     print("\nListening for data...")
     while True:
-        sample, timestamp = inlet.pull_sample()
-        print(f"Received: {sample} at {timestamp:.6f}")
+        sample, timestamp = inlet.pull_sample(timeout=1.0)
+        if sample:
+            print(sample)
+            print(f"Received: {sample} at {timestamp:.6f}")
+        else:
+            print("No sample received.")
+            
 else:
     print("No streams found. Check network settings.")

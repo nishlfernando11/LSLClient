@@ -38,11 +38,15 @@ stream_names = ['EQ_ECG_Stream', 'EQ_HR_Stream', 'EQ_Accel_Stream',
 def retry_socket_connection():
     while not socket_connected.is_set():
         try:
-            sio.connect(f'http://{SERVER_IP}:{PORT}')
-            socket_connected.set()
-            print_green("Socket connection established.")
+            if not sio.connected:
+                print("🔄 Attempting socket connection...")
+                sio.connect(f'http://{SERVER_IP}:{PORT}')
+                socket_connected.set()
+                print_green("✅ Socket connection established.")
+            # else:
+            #     print_yellow("⚠️ Socket already connected or connecting.")
         except Exception as e:
-            print(f"Socket connection failed, retrying: {e}")
+            print_red(f"Socket connection failed, retrying: {e}")
             time.sleep(5)
 
 
@@ -51,7 +55,7 @@ def resolve_streams_continuously():
     global subscriber
     while not resolution_event.is_set():
         subscriber.resolve_unresolved_streams()
-        time.sleep(5)
+        time.sleep(1)
 
 
 @sio.event
@@ -85,7 +89,9 @@ def handle_start(data):
     print_green(f"Starting data collection: {csv_path}")
 
     subscriber.set_csv_path(csv_path)
-    subscriber.start_collection()
+    # subscriber.start_collection()
+    subscriber.start_collection(flush_interval=5.0, buffer_size_threshold=200)
+
 
 
 @sio.on('stop_ecg')

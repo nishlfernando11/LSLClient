@@ -61,7 +61,19 @@ class LSLSubscriber:
         for name in unresolved:
             self.resolve_stream(name)
 
-    def start_collection(self):
+    def start_collection(self, flush_interval=5.0, buffer_size_threshold=100):
+        if not self.csv_writer:
+            self.setup_csv()
+
+        self.running = True
+        self.collection_thread = threading.Thread(
+            target=self.collect_data, 
+            args=(flush_interval, buffer_size_threshold)
+        )
+        self.collection_thread.start()
+
+
+    def start_collection_old(self):
         if not self.csv_writer:
             self.setup_csv()
 
@@ -104,8 +116,76 @@ class LSLSubscriber:
     #                 except Exception as e:
     #                     logging.error(f"Error collecting data from {name}: {e}")
     #         time.sleep(0.001)
-            
-    def collect_data(self):
+       
+        
+    def collect_data(self, flush_interval=5.0, buffer_size_threshold=100):
+        buffer = []  # Global buffer for all streams
+        last_flush_time = time.time()
+
+        try:
+            while self.running:
+                current_time = time.time()
+
+                # Read from all inlets
+                with self.collection_lock:
+                    for name, inlet in self.inlets.items():
+                        try:
+                            sample, timestamp = inlet.pull_sample(timeout=0.0)
+                            if sample:
+                                data_sample = json.loads(str(sample[0]))
+                                buffer.append({
+                                    "stream": name,
+                                    "timestamp": f"{timestamp:.6f}",
+                                    "data": json.dumps(data_sample)
+                                })
+                        except Exception as e:
+                            logging.error(f"Error collecting data from {name}: {e}")
+
+                # Flush buffer periodically or if too large
+                if (current_time - last_flush_time >= flush_interval) or len(buffer) >= buffer_size_threshold:
+                    with self.collection_lock:
+                        # for row in sorted(buffer, key=lambda x: x["timestamp"]):
+                        for row in buffer:
+                            self.csv_writer.writerow(row)
+                        self.csv_file.flush()
+                        buffer.clear()
+                        last_flush_time = current_time
+
+                time.sleep(0.01)
+        except Exception as e:
+            logging.critical(f"Fatal error in data collection: {e}")
+
+
+    def collect_data_old(self):
+        try:
+            while self.running:
+                with self.collection_lock:
+                    rows = []
+                    for name, inlet in self.inlets.items():
+                        try:
+                            sample, timestamp = inlet.pull_sample(timeout=0.0)
+                            if sample:
+                                data_sample = json.loads(str(sample[0]))
+                                rows.append({
+                                    "stream": name,
+                                    "timestamp": float(timestamp),
+                                    "data": json.dumps(data_sample)
+                                })
+                        except Exception as e:
+                            logging.error(f"Error collecting data from {name}: {e}")
+                    # Sort by timestamp and write
+                    for row in sorted(rows, key=lambda x: x["timestamp"]):
+                        self.csv_writer.writerow({
+                            "stream": row["stream"],
+                            "timestamp": f"{row['timestamp']:.6f}",
+                            "data": row["data"]
+                        })
+                time.sleep(0.001)
+        except Exception as e:
+            logging.critical(f"Fatal error in data collection: {e}")
+
+     
+    def collect_data_older(self):
         try:
             while self.running:
                 with self.collection_lock:

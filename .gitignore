@@ -10,3 +10,4 @@ datalogs
 .env
 
 __pycache__
+.DS*
